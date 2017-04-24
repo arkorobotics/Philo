@@ -1,0 +1,14 @@
+{
+	"Vehicle":
+	{
+		"tank": "NIN-90-4500SO-GG",
+		"avionics_mass": 0.2,
+		"mech_mass": 0.2
+	},
+
+	"Engine":
+	{
+		"Isp": 100,
+		"fuel": "Air"
+	}
+}
