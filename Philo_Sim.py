@@ -104,8 +104,8 @@ def run_sim(vehicle):
 	#	mass loss during flight. More fuel you use, the less thrust 
 	#	you need to null-out m*g.
 	while (vehicle.fuel_mass > 0):
-		F_null = vehicle.veh_mass*g
-		vehicle.mass_flow = F_null/vehicle.engine.V_e
+		vehicle.Fnull = vehicle.veh_mass*g
+		vehicle.mass_flow = vehicle.Fnull/vehicle.engine.V_e
 		vehicle.fuel_mass -= vehicle.mass_flow*dt
 		flight_time += dt 
 	#print veh_mass
