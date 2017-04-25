@@ -4,7 +4,7 @@
 		"fuel_type": "Compressed Dry Air",
 		"cp": 1.005,
 		"cv": 0.718,
-		"molar_mass": 29.97
+		"molar_mass": 0.02897
 	},
 
 	"C02":
@@ -12,6 +12,6 @@
 		"fuel_type": "Carbon Dioxide",
 		"cp": 0.846,
 		"cv": 0.657,
-		"molar_mass": 44.01
+		"molar_mass": 0.04401
 	}
 }
