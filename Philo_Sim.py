@@ -97,7 +97,7 @@ veh_mass = wet_mass
 Isp = 100			# sec (TO BE DETERMINED)
 V_e = Isp*g			# m/s
 F_null = veh_mass*g		# N (kg*m/s^2)
-mass_flow = F_null/V_e
+mass_flow = F_null/V_e		# kg/s
 
 # Flight Variables
 flight_time = 0			# sec
@@ -105,9 +105,9 @@ flight_time = 0			# sec
 
 # Flight Sim
 # ----------------------------------------
-print "Initial Fuel Mass (kg): \t %.8f" % fuel_mass
-print "Initial Vehicle Wet Mass (kg): \t %.8f" % wet_mass
-print "Exhaust Mass Flow (kg/s): \t %.8f" % mass_flow
+print "Initial Fuel Mass (kg): \t\t\t %.8f" % fuel_mass
+print "Initial Vehicle Wet Mass (kg): \t\t\t %.8f" % wet_mass
+print "Exhaust Mass Flow (kg/s): \t\t\t %.8f" % mass_flow
 
 # Using Rocket Equation
 #delta_v = V_e*np.log(wet_mass/dry_mass)
@@ -115,7 +115,7 @@ print "Exhaust Mass Flow (kg/s): \t %.8f" % mass_flow
 
 # Using Mass Flow
 flight_time = fuel_mass/mass_flow
-print "Flight Time (sec): \t\t %.8f" % flight_time
+print "Fixed Mass Flow - Flight Time (sec): \t\t %.8f" % flight_time
 flight_time = 0.0
 
 # Using Numerical Approx, mass loss thrust compensation
@@ -130,7 +130,7 @@ while (fuel_mass > 0):
 	flight_time += dt 
 	#print veh_mass
 	
-print "Flight Time (sec): \t\t %.8f" % flight_time
+print "Fixed Position - Flight Time (sec): \t\t %.8f" % flight_time
 # ----------------------------------------
 
 #x = np.zeros ( (n,3) )
