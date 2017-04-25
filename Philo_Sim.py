@@ -12,7 +12,7 @@ import json
 import sys
 
 # Natural Constants
-R = 8.314	# J/(K*mol)
+R = 8.314	# J/(K*mol) or ((Kg*m^2)/s^2)/(K*mol)
 g = 9.81	# m/s^2
 P_amb = 101325	# Pa
 T_amb = 298.15	# K
@@ -87,7 +87,6 @@ def run_sim(vehicle):
 	print("Initial Vehicle Dry Mass (kg): %f" %vehicle.dry_mass)
 	print("Initial Fuel Mass (kg): %f" %vehicle.fuel_mass)
 	print("Initial Vehicle Wet Mass (kg): %f" %vehicle.wet_mass)
-
 	print("Exhaust Mass Flow (kg/s): %f" %vehicle.mass_flow)
 
 	# Using Rocket Equation
@@ -109,7 +108,7 @@ def run_sim(vehicle):
 		vehicle.mass_flow = F_null/vehicle.engine.V_e
 		vehicle.fuel_mass -= vehicle.mass_flow*dt
 		flight_time += dt 
-		#print F_null
+	#print veh_mass
 		
 	print("\nEND OF FLIGHT")
 	print("Flight Time (sec): %f" %flight_time)
