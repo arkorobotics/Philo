@@ -10,6 +10,10 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import json
 import sys
+import os.path
+
+# Default Config File
+philo_cfg_file = "philo_cfg.json"
 
 # Natural Constants
 R = 8.314	# J/(K*mol) or ((Kg*m^2)/s^2)/(K*mol)
@@ -71,7 +75,7 @@ class Vehicle:
 #regulator = {'':
 def run_sim(vehicle):
 	# Simulation
-	print "Philo Sim"
+	print "\nPhilo Sim"
 	print "-----------------------"
 
 	# Sim Constants
@@ -111,7 +115,7 @@ def run_sim(vehicle):
 		flight_time += dt 
 		
 	print("Constant Acceleration - Flight Time (sec): \t %.6f" %flight_time)
-	print "-----------------------"
+	print "-----------------------\n"
 	# ----------------------------------------
 
 	#x = np.zeros ( (n,3) )
@@ -183,9 +187,21 @@ def load_config(cfgfile):
 	return vehicleobj
 if __name__ == "__main__":
 	if len(sys.argv) > 1:
-		vehicle = load_config(sys.argv[1])
-
-		run_sim(vehicle)
+		if(os.path.isfile(sys.argv[1])):
+			philo_cfg_file = sys.argv[1]
+			vehicle = load_config(sys.argv[1])
+		else:
+			print "\n\033[91m{}\033[00m".format("ERROR: "),
+			print "Config file not found."
+			
+			print "\033[93m{}\033[00m".format("WARNING: "),
+			print "Loading default config: %s" % philo_cfg_file 
+	else:	
+		print "\n\033[93m{}\033[00m".format("WARNING:"),
+		print " Config file undefined... loading default config: %s" % philo_cfg_file 
+	
+	vehicle = load_config(philo_cfg_file)
+	run_sim(vehicle)
 
 
 
