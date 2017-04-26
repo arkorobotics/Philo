@@ -29,7 +29,7 @@ class Fuel:
 		self.cp = cp				#@ 0.0C
 		self.cv = cv				#@ 0.0C
 		self.molar_mass = molar_mass
-		self.specific_heat_ratio = cp/cv
+		self.gamma = cp/cv
 
 class Tank:
 	def __init__(self, volume, pressure, tank_mass, reg_min, reg_max, temp):
@@ -38,7 +38,8 @@ class Tank:
 		self.tank_mass = tank_mass	# kg
 		self.reg_min = reg_min
 		self.reg_max = reg_max
-		self.temp = temp 		# K
+		self.temp = temp 			# K
+
 class Regulator:
 	def __init__(self, in_min, in_max, out_min, out_max, reg_set, reg_in, reg_out):
 		self.in_min = in_min
@@ -49,14 +50,18 @@ class Regulator:
 		self.reg_in = reg_in
 		self.reg_out = reg_out
 
-class Resistojet:
-	def __init(self, filament_temp):
-		self.filament_temp = filament_temp
+class Filament:
+	def __init__(self, T_chamber):
+		self.T_chamber = T_chamber
 
 class Engine:
-	def __init__(self,Isp):
-		self.Isp = Isp
-		self.V_e = self.Isp * g
+	def __init__(self, fuel, P_in, P_ambient, filament):
+		self.fuel = fuel
+		self.filament = filament
+		self.V_e = np.sqrt( ((self.filament.T_chamber*R)/self.fuel.molar_mass) \
+			   * ((2*self.fuel.gamma)/(self.fuel.gamma-1)) \
+			   * ( 1 - (P_ambient/P_in)**( (self.fuel.gamma-1)/self.fuel.gamma ) ) ) 
+		self.Isp = self.V_e / g
 		
 class Vehicle:
 	def __init__(self, avionics_mass, mech_mass, tank, engine, fuel):
@@ -133,6 +138,7 @@ def load_config(cfgfile):
 	cfg = None
 	tanks = None
 	fuels = None
+	filaments = None
 
 	with open(cfgfile) as cfgson:
 		cfg = json.load(cfgson)
@@ -143,11 +149,16 @@ def load_config(cfgfile):
 	with open("fuels.json") as fuelson:
 		fuels = json.load(fuelson)
 
+	with open("filaments.json") as filamentsson:
+		filaments = json.load(filamentsson)
+
 	cfgdat = {
 				"tank": None,
 				"avionics_mass": None,
 				"mech_mass": None,
-				"Isp": None,
+				"P_ambient": None,
+				"P_in": None,
+				"filament": None,
 				"fuel": None
 	}
 
@@ -169,10 +180,14 @@ def load_config(cfgfile):
 	if "Engine" in sections:
 		sec = cfg["Engine"]
 
-		if "Isp" in sec:
-			cfgdat["Isp"] = sec["Isp"]
 		if "fuel" in sec:
 			cfgdat["fuel"] = fuels[sec["fuel"]]
+		if "P_ambient" in sec:
+			cfgdat["P_ambient"] = sec["P_ambient"]
+		if "P_in" in sec:
+			cfgdat["P_in"] = sec["P_in"]
+		if "filament" in sec:
+			cfgdat["filament"] = filaments[sec["filament"]]
 
 	# Initialize a Tank object
 	tankdat = cfgdat["tank"]
@@ -182,8 +197,12 @@ def load_config(cfgfile):
 	fueldat = cfgdat["fuel"]
 	fuelobj = Fuel(fueldat["fuel_type"], fueldat["cp"], fueldat["cv"], fueldat["molar_mass"])
 
+	# Initialize a Filament Object
+	filamentdat = cfgdat["filament"] 
+	filamentobj = Filament(filamentdat["T_chamber"])
+
 	# Initialize an Engine Object
-	engineobj = Engine(cfgdat["Isp"])
+	engineobj = Engine(fuelobj, cfgdat["P_in"], cfgdat["P_ambient"], filamentobj)
 
 	# Create the vehicle object
 	vehicleobj = Vehicle(cfgdat["avionics_mass"], cfgdat["mech_mass"], tankobj, engineobj, fuelobj)
