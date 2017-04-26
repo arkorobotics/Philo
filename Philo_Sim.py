@@ -23,6 +23,14 @@ T_amb = 298.15	# K
 
 
 # Rocket Classes 
+class Fuel:
+	def __init__(self, fuel_type, cp, cv, molar_mass):
+		self.fuel_type = fuel_type
+		self.cp = cp				#@ 0.0C
+		self.cv = cv				#@ 0.0C
+		self.molar_mass = molar_mass
+		self.specific_heat_ratio = cp/cv
+
 class Tank:
 	def __init__(self, volume, pressure, tank_mass, reg_min, reg_max, temp):
 		self.volume = volume		# m^3
@@ -41,13 +49,9 @@ class Regulator:
 		self.reg_in = reg_in
 		self.reg_out = reg_out
 
-class Fuel:
-	def __init__(self, fuel_type, cp, cv, molar_mass):
-		self.fuel_type = fuel_type
-		self.cp = cp				#@ 0.0C
-		self.cv = cv				#@ 0.0C
-		self.molar_mass = molar_mass
-		self.specific_heat_ratio = cp/cv
+class Resistojet:
+	def __init(self, filament_temp):
+		self.filament_temp = filament_temp
 
 class Engine:
 	def __init__(self,Isp):
@@ -185,6 +189,7 @@ def load_config(cfgfile):
 	vehicleobj = Vehicle(cfgdat["avionics_mass"], cfgdat["mech_mass"], tankobj, engineobj, fuelobj)
 
 	return vehicleobj
+
 if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		if(os.path.isfile(sys.argv[1])):
