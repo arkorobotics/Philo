@@ -1,0 +1,16 @@
+{
+	"No Filament":
+	{
+		"T_chamber": 298.15
+	},
+
+	"Nichrome 1000":
+	{
+		"T_chamber": 1000
+	},
+
+	"3D Printed Grid":
+	{
+		"T_chamber": 1000
+	}
+}
