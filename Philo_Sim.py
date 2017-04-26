@@ -26,7 +26,7 @@ class Tank:
 		self.tank_mass = tank_mass	# kg
 		self.reg_min = reg_min
 		self.reg_max = reg_max
-		self.temp = temp 			# K
+		self.temp = temp 		# K
 class Regulator:
 	def __init__(self, in_min, in_max, out_min, out_max, reg_set, reg_in, reg_out):
 		self.in_min = in_min
@@ -48,7 +48,6 @@ class Fuel:
 class Engine:
 	def __init__(self,Isp):
 		self.Isp = Isp
-
 		self.V_e = self.Isp * g
 		
 class Vehicle:
@@ -58,7 +57,8 @@ class Vehicle:
 		self.tank = tank
 		self.engine = engine
 		self.fuel = fuel
-		self.fuel_mass = ((self.tank.pressure * self.tank.volume)/(R*self.tank.temp)) * self.fuel.molar_mass
+		self.fuel_mass = ((self.tank.pressure * self.tank.volume)/(R*self.tank.temp)) \
+				 * self.fuel.molar_mass
 
 		self.dry_mass = self.tank.tank_mass + self.avionics_mass + self.mech_mass
 		self.wet_mass = self.dry_mass + self.fuel_mass
@@ -84,18 +84,18 @@ def run_sim(vehicle):
 
 	# Flight Sim
 	# ----------------------------------------
-	print("Initial Vehicle Dry Mass (kg): %f" %vehicle.dry_mass)
-	print("Initial Fuel Mass (kg): %f" %vehicle.fuel_mass)
-	print("Initial Vehicle Wet Mass (kg): %f" %vehicle.wet_mass)
-	print("Exhaust Mass Flow (kg/s): %f" %vehicle.mass_flow)
+	print("Initial Vehicle Dry Mass (kg): \t\t\t %.6f" %vehicle.dry_mass)
+	print("Initial Fuel Mass (kg): \t\t\t %.6f" %vehicle.fuel_mass)
+	print("Initial Vehicle Wet Mass (kg): \t\t\t %.6f" %vehicle.wet_mass)
+	print("Exhaust Mass Flow (kg/s): \t\t\t %.6f" %vehicle.mass_flow)
 
 	# Using Rocket Equation
 	delta_v = vehicle.engine.V_e * np.log(vehicle.wet_mass/vehicle.dry_mass)
-	print("Delta V (m/s): %f" %delta_v)
+	print("Delta V (m/s): \t\t\t\t\t %.6f" %delta_v)
 
 	# Using Mass Flow
 	flight_time = vehicle.fuel_mass/vehicle.mass_flow
-	print("Flight Time (sec): %f" %flight_time)
+	print("Constant Thrust - Flight Time (sec): \t\t %.6f" %flight_time)
 
 	flight_time = 0
 
@@ -104,14 +104,14 @@ def run_sim(vehicle):
 	#	mass loss during flight. More fuel you use, the less thrust 
 	#	you need to null-out m*g.
 	while (vehicle.fuel_mass > 0):
+		vehicle.veh_mass = vehicle.dry_mass + vehicle.fuel_mass	
 		vehicle.Fnull = vehicle.veh_mass*g
 		vehicle.mass_flow = vehicle.Fnull/vehicle.engine.V_e
 		vehicle.fuel_mass -= vehicle.mass_flow*dt
 		flight_time += dt 
-	#print veh_mass
 		
-	print("\nEND OF FLIGHT")
-	print("Flight Time (sec): %f" %flight_time)
+	print("Constant Acceleration - Flight Time (sec): \t %.6f" %flight_time)
+	print "-----------------------"
 	# ----------------------------------------
 
 	#x = np.zeros ( (n,3) )
