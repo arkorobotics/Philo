@@ -58,10 +58,25 @@ class Engine:
 	def __init__(self, fuel, P_in, P_ambient, filament):
 		self.fuel = fuel
 		self.filament = filament
+		self.P_in = P_in
+		self.P_ambient = P_ambient
+
 		self.V_e = np.sqrt( ((self.filament.T_chamber*R)/self.fuel.molar_mass) \
 			   * ((2*self.fuel.gamma)/(self.fuel.gamma-1)) \
 			   * ( 1 - (P_ambient/P_in)**( (self.fuel.gamma-1)/self.fuel.gamma ) ) ) 
 		self.Isp = self.V_e / g
+
+	def calc_Ve(self):
+		"""
+			Updates V_e and Isp based on current pressure setting P_in.
+			Returns V_e
+		"""
+		self.V_e = np.sqrt( ((self.filament.T_chamber*R)/self.fuel.molar_mass) \
+		   * ((2*self.fuel.gamma)/(self.fuel.gamma-1)) \
+		   * ( 1 - (self.P_ambient/self.P_in)**( (self.fuel.gamma-1)/self.fuel.gamma ) ) )
+
+		self.Isp = self.V_e / g
+		return self.V_e
 		
 class Vehicle:
 	def __init__(self, avionics_mass, mech_mass, tank, engine, fuel):
@@ -119,7 +134,7 @@ def run_sim(vehicle):
 	while (vehicle.fuel_mass > 0):
 		vehicle.veh_mass = vehicle.dry_mass + vehicle.fuel_mass	
 		vehicle.Fnull = vehicle.veh_mass*g
-		vehicle.mass_flow = vehicle.Fnull/vehicle.engine.V_e
+		vehicle.mass_flow = vehicle.Fnull/vehicle.engine.calc_Ve()
 		vehicle.fuel_mass -= vehicle.mass_flow*dt
 		flight_time += dt 
 		
