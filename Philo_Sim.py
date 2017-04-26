@@ -7,6 +7,7 @@
 
 import matplotlib
 import numpy as np
+import math
 #import matplotlib.pyplot as plt
 import json
 import sys
@@ -43,14 +44,69 @@ class Fuel:
 		self.cp = cp				#@ 0.0C
 		self.cv = cv				#@ 0.0C
 		self.molar_mass = molar_mass
-		self.specific_heat_ratio = cp/cv
+		self.k = cp/cv # specific heat ratio
+		print("vehicle.fuel.k: %f" %self.k)
 
 class Engine:
-	def __init__(self,Isp):
+	def __init__(self, fuel, A_throat, A_exit, Isp, Pc_max, Tc):
+		self.fuel = fuel
 		self.Isp = Isp
+		self.A_throat = A_throat
+		self.A_exit = A_exit
+		self.Pc_max = Pc_max
+		self.Tc = Tc
+		self.ve_avg = self.Isp * g
 
-		self.V_e = self.Isp * g
-		
+		self.mass_flow = 0.0
+		self.Pc = 0.0
+
+	def ideal_thrust_coefficient(self, Pc):
+		"""
+			Calculate the ideal thrust coefficient of the engine from the chamber pressure.
+			Equation 3-30 of Sutton and Biblarz, assuming p2 = p3.
+		"""
+
+		return math.sqrt( (2*self.fuel.k)/(self.fuel.k-1) * pow(2/(self.fuel.k + 1), (self.fuel.k + 1)/(self.fuel.k-1)) * ( 1 - pow(P_amb/self.Pc, (self.fuel.k - 1)/self.fuel.k) ) )
+
+	def thrust_coefficient_viscous_effect(self):
+		"""
+			Calculates the viscuous effect on the thrust coefficient.
+			Equation 5 of Hashem.
+			Note - Requires the Reynolds number of the throat...
+		"""
+		return 17.6 * math.exp((0.0032 * self.A_exit) / self.A_throat)
+
+	def thrust_coefficient(self, Pc):
+		"""
+			Returns the adjusted thrust coefficient of the engine
+		"""
+		return self.ideal_thrust_coefficient(Pc) # just the ideal coefficient for now. Should be C_ideal - C_viscuous_effect
+
+	def calc_mass_flow(self, F):
+		"""
+			Returns the mass flow for a given thrust setting. Assumes Pexit = Pambient
+		"""
+		return F/self.v_e(F)
+
+	def calc_Pc(self, F):
+		"""
+			Returns the required chamber pressure for a given thrust setting and mass flow
+		"""
+		return F / (self.thrust_coefficient() * self.A_throat)
+
+	def calc_F(self, Pc):
+		"""
+			Returns the thrust produced at a given chamber pressure
+		"""
+		return self.thrust_coefficient() * self.A_throat * Pc
+
+	def v_e(self, F):
+		"""
+			Returns the nozzle exit velocity given the current chamber pressure and temperature (P_chamber and T_chamber).
+			This ignores chamber velocity V_1 and assumes ideal thermodynamic expansion such that nozzle exit pressure == ambient pressure
+		"""
+		return math.sqrt( (2*self.fuel.k)/(self.fuel.k-1) * R * self.Tc * (1 - pow(P_amb/self.calc_Pc(F), (self.fuel.k-1)/self.fuel.k) ) )
+
 class Vehicle:
 	def __init__(self, avionics_mass, mech_mass, tank, engine, fuel):
 		self.avionics_mass = avionics_mass
@@ -64,8 +120,11 @@ class Vehicle:
 		self.wet_mass = self.dry_mass + self.fuel_mass
 		self.veh_mass = self.wet_mass # Initial (wet) condition
 
-		self.Fnull = self.wet_mass * g
-		self.mass_flow = self.Fnull/self.engine.V_e
+		self.Fnull = self.wet_mass * g # Initial
+		self.mass_flow = self.Fnull/(self.engine.Isp * g) # Initial
+
+	def calc_Fnull(self):
+		return self.wet_mass * g
 
 
 #regulator = {'':
@@ -90,7 +149,7 @@ def run_sim(vehicle):
 	print("Exhaust Mass Flow (kg/s): %f" %vehicle.mass_flow)
 
 	# Using Rocket Equation
-	delta_v = vehicle.engine.V_e * np.log(vehicle.wet_mass/vehicle.dry_mass)
+	delta_v = vehicle.engine.ve_avg * np.log(vehicle.wet_mass/vehicle.dry_mass)
 	print("Delta V (m/s): %f" %delta_v)
 
 	# Using Mass Flow
@@ -104,8 +163,8 @@ def run_sim(vehicle):
 	#	mass loss during flight. More fuel you use, the less thrust 
 	#	you need to null-out m*g.
 	while (vehicle.fuel_mass > 0):
-		vehicle.Fnull = vehicle.veh_mass*g
-		vehicle.mass_flow = vehicle.Fnull/vehicle.engine.V_e
+		vehicle.Fnull = vehicle.calc_Fnull()
+		vehicle.engine.mass_flow = vehicle.engine.calc_mass_flow(vehicle.Fnull)
 		vehicle.fuel_mass -= vehicle.mass_flow*dt
 		flight_time += dt 
 	#print veh_mass
@@ -139,8 +198,12 @@ def load_config(cfgfile):
 				"tank": None,
 				"avionics_mass": None,
 				"mech_mass": None,
+				"fuel": None,
+				"A_throat": None,
+				"A_exit": None,
 				"Isp": None,
-				"fuel": None
+				"Pc_max": None,
+				"Tc": None
 	}
 
 	# get a list of the sections in the config
@@ -161,10 +224,19 @@ def load_config(cfgfile):
 	if "Engine" in sections:
 		sec = cfg["Engine"]
 
-		if "Isp" in sec:
-			cfgdat["Isp"] = sec["Isp"]
 		if "fuel" in sec:
 			cfgdat["fuel"] = fuels[sec["fuel"]]
+		if "A_throat" in sec:
+			cfgdat["A_throat"] = sec["A_throat"]
+		if "A_exit" in sec:
+			cfgdat["A_exit"] = sec["A_exit"]
+		if "Isp" in sec:
+			cfgdat["Isp"] = sec["Isp"]
+		if "Pc_max" in sec:
+			cfgdat["Pc_max"] = sec["Pc_max"]
+		if "Tc" in sec:
+			cfgdat["Tc"] = sec["Tc"]
+		
 
 	# Initialize a Tank object
 	tankdat = cfgdat["tank"]
@@ -175,7 +247,7 @@ def load_config(cfgfile):
 	fuelobj = Fuel(fueldat["fuel_type"], fueldat["cp"], fueldat["cv"], fueldat["molar_mass"])
 
 	# Initialize an Engine Object
-	engineobj = Engine(cfgdat["Isp"])
+	engineobj = Engine(fuelobj, cfgdat["A_throat"], cfgdat["A_exit"], cfgdat["Isp"], cfgdat["Pc_max"], cfgdat["Tc"])
 
 	# Create the vehicle object
 	vehicleobj = Vehicle(cfgdat["avionics_mass"], cfgdat["mech_mass"], tankobj, engineobj, fuelobj)
