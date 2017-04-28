@@ -11,6 +11,6 @@
 		"fuel": "Air",
 		"P_ambient": 101325.0,
 		"P_in": 689476.0,
-		"filament": "No Filament"
+		"heater": "No Heater"
 	}
 }

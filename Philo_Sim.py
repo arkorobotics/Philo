@@ -50,7 +50,7 @@ class Regulator:
 		self.reg_in = reg_in
 		self.reg_out = reg_out
 
-class Filament:
+class Heater:
 	def __init__(self, T_chamber):
 		self.T_chamber = T_chamber
 
@@ -153,7 +153,7 @@ def load_config(cfgfile):
 	cfg = None
 	tanks = None
 	fuels = None
-	filaments = None
+	heaters = None
 
 	with open(cfgfile) as cfgson:
 		cfg = json.load(cfgson)
@@ -164,8 +164,8 @@ def load_config(cfgfile):
 	with open("fuels.json") as fuelson:
 		fuels = json.load(fuelson)
 
-	with open("filaments.json") as filamentsson:
-		filaments = json.load(filamentsson)
+	with open("heaters.json") as heaterson:
+		heaters = json.load(heaterson)
 
 	cfgdat = {
 				"tank": None,
@@ -173,7 +173,7 @@ def load_config(cfgfile):
 				"mech_mass": None,
 				"P_ambient": None,
 				"P_in": None,
-				"filament": None,
+				"heater": None,
 				"fuel": None
 	}
 
@@ -201,8 +201,8 @@ def load_config(cfgfile):
 			cfgdat["P_ambient"] = sec["P_ambient"]
 		if "P_in" in sec:
 			cfgdat["P_in"] = sec["P_in"]
-		if "filament" in sec:
-			cfgdat["filament"] = filaments[sec["filament"]]
+		if "heater" in sec:
+			cfgdat["heater"] = heaters[sec["heater"]]
 
 	# Initialize a Tank object
 	tankdat = cfgdat["tank"]
@@ -212,12 +212,12 @@ def load_config(cfgfile):
 	fueldat = cfgdat["fuel"]
 	fuelobj = Fuel(fueldat["fuel_type"], fueldat["cp"], fueldat["cv"], fueldat["molar_mass"])
 
-	# Initialize a Filament Object
-	filamentdat = cfgdat["filament"] 
-	filamentobj = Filament(filamentdat["T_chamber"])
+	# Initialize a Heater Object
+	heaterdat = cfgdat["heater"] 
+	heaterobj = Heater(heaterdat["T_chamber"])
 
 	# Initialize an Engine Object
-	engineobj = Engine(fuelobj, cfgdat["P_in"], cfgdat["P_ambient"], filamentobj)
+	engineobj = Engine(fuelobj, cfgdat["P_in"], cfgdat["P_ambient"], heaterobj)
 
 	# Create the vehicle object
 	vehicleobj = Vehicle(cfgdat["avionics_mass"], cfgdat["mech_mass"], tankobj, engineobj, fuelobj)
