@@ -15,7 +15,7 @@ def load_config(cfgfile):
     if len(cfgfile) > 1:
         if os.path.isfile("vehicle/" + cfgfile[1]):
             philo_cfg_file = cfgfile[1]
-            vehicle = config.load_config(cfgfile[1])
+            # vehicle = config.load_config(cfgfile[1])
         else:
             print("\n\033[91m{}\033[00m".format("ERROR: "))
             print("Config file not found.")
