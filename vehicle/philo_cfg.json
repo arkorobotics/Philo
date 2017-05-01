@@ -1,17 +1,17 @@
 {
-	"Vehicle":
-	{
-		"avionics_mass": 0.2,
-		"mech_mass": 0.2,
-		"tank": "NIN-90-4500SO-GG",
-		"propellant": "Air",
-		"regulator": "Generic",
-		"heater": "No Heater",
-		"engine": "Air_Engine"
-	},
+    "Vehicle":
+    {
+        "avionics_mass": 0.2,
+        "mech_mass": 0.2,
+        "tank": "NIN-90-4500SO-GG",
+        "propellant": "Air",
+        "regulator": "Generic",
+        "heater": "No Heater",
+        "engine": "Air_Engine"
+    },
 
-	"Environment":
-	{
-		"P_ambient": 101325.0 
-	}
+    "Environment":
+    {
+        "P_ambient": 101325.0 
+    }
 }

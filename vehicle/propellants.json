@@ -1,17 +1,17 @@
 {
-	"Air":
-	{
-		"propellant_type": "Compressed Dry Air",
-		"cp": 1.005,
-		"cv": 0.718,
-		"molar_mass": 0.02897
-	},
+    "Air":
+    {
+        "propellant_type": "Compressed Dry Air",
+        "cp": 1.005,
+        "cv": 0.718,
+        "molar_mass": 0.02897
+    },
 
-	"CO2":
-	{
-		"propellant_type": "Carbon Dioxide",
-		"cp": 0.846,
-		"cv": 0.657,
-		"molar_mass": 0.04401
-	}
+    "CO2":
+    {
+        "propellant_type": "Carbon Dioxide",
+        "cp": 0.846,
+        "cv": 0.657,
+        "molar_mass": 0.04401
+    }
 }
