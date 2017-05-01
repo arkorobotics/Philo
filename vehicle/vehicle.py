@@ -61,7 +61,8 @@ class Engine:
         self.V_e = np.sqrt(((self.heater.T_chamber * R) / self.propellant.molar_mass) \
                            * ((2 * self.propellant.gamma) / (self.propellant.gamma - 1)) \
                            * (
-                           1 - (self.P_ambient / self.P_in) ** ((self.propellant.gamma - 1) / self.propellant.gamma)))
+                               1 - (self.P_ambient / self.P_in) ** (
+                                   (self.propellant.gamma - 1) / self.propellant.gamma)))
 
         self.Isp = self.V_e / g
         return self.V_e
