@@ -30,18 +30,21 @@ def run_sim(vehicle):
 
 	# Flight Sim
 	# ----------------------------------------
-	print("Initial Vehicle Dry Mass (kg): \t\t\t %.6f" %vehicle.dry_mass)
-	print("Initial Propellant Mass (kg): \t\t\t %.6f" %vehicle.propellant_mass)
-	print("Initial Vehicle Wet Mass (kg): \t\t\t %.6f" %vehicle.wet_mass)
-	print("Exhaust Mass Flow (kg/s): \t\t\t %.6f" %vehicle.mass_flow)
+	print ("Initial Vehicle Dry Mass (kg): \t\t\t %.6f" %vehicle.dry_mass)
+	print ("Initial Propellant Mass (kg): \t\t\t %.6f" %vehicle.propellant_mass)
+	print ("Initial Vehicle Wet Mass (kg): \t\t\t %.6f" %vehicle.wet_mass)
+	print ("Exhaust Mass Flow (kg/s): \t\t\t %.6f" %vehicle.mass_flow)
 
 	# Using Rocket Equation
 	delta_v = vehicle.engine.V_e * np.log(vehicle.wet_mass/vehicle.dry_mass)
-	print("Delta V (m/s): \t\t\t\t\t %.6f" %delta_v)
+	print ("Delta V (m/s): \t\t\t\t\t %.6f" %delta_v)
 
+	# Print Engine Isp
+	print("Engine Specifc Impulse (sec): \t\t\t %.6f" %vehicle.engine.Isp)
+	
 	# Using Mass Flow
 	flight_time = vehicle.propellant_mass/vehicle.mass_flow
-	print("Constant Thrust - Flight Time (sec): \t\t %.6f" %flight_time)
+	print ("Constant Thrust - Flight Time (sec): \t\t %.6f" %flight_time)
 
 	flight_time = 0
 
@@ -56,7 +59,7 @@ def run_sim(vehicle):
 		vehicle.propellant_mass -= vehicle.mass_flow*dt
 		flight_time += dt 
 		
-	print("Constant Acceleration - Flight Time (sec): \t %.6f" %flight_time)
+	print ("Constant Acceleration - Flight Time (sec): \t %.6f" %flight_time)
 	print ("-----------------------\n")
 	# ----------------------------------------
 

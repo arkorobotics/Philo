@@ -82,3 +82,4 @@ class Vehicle:
 
 		self.Fnull = self.wet_mass * g
 		self.mass_flow = self.Fnull/self.engine.V_e
+		
