@@ -4,8 +4,9 @@
 		"volume": 0.00147484,
 		"pressure": 3.1026e+7,
 		"tank_mass": 1.49,
-		"reg_min": 3.103e+6,
+		"reg_min": 2.068e+6,
 		"reg_max": 5.516e+6,
+		"reg_out": 2.068e+6,
 		"temp": 298.15
 	},
 
@@ -14,8 +15,9 @@
 		"volume": 0.00111432,
 		"pressure": 3.1026e+7,
 		"tank_mass": 1.36,
-		"reg_min": 3.103e+6,
+		"reg_min": 2.068e+6,
 		"reg_max": 5.516e+6,
+		"reg_out": 2.068e+6,
 		"temp": 298.15
 	},
 
@@ -24,9 +26,9 @@
 		"volume": 0.00081935,
 		"pressure": 3.1026e+7,
 		"tank_mass": 1.04,
-		"reg_min": 3.103e+6,
+		"reg_min": 2.068e+6,
 		"reg_max": 5.516e+6,
+		"reg_out": 2.068e+6,
 		"temp": 298.15
 	}
-
 }
