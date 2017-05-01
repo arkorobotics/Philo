@@ -4,7 +4,6 @@ import json
 import sys
 import os.path
 
-# TODO: Bad hack, fix this
 from .env import *
 from .vehicle import *
 
