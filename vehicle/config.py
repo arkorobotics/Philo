@@ -5,8 +5,8 @@ import sys
 import os.path
 
 # TODO: Bad hack, fix this
-from env import *
-from vehicle import *
+from .env import *
+from .vehicle import *
 
 def load_config(cfgfile):
 
@@ -18,14 +18,14 @@ def load_config(cfgfile):
 			philo_cfg_file = cfgfile[1]
 			vehicle = config.load_config(cfgfile[1])
 		else:
-			print "\n\033[91m{}\033[00m".format("ERROR: "),
-			print "Config file not found."
+			print ("\n\033[91m{}\033[00m".format("ERROR: ")),
+			print ("Config file not found.")
 			
-			print "\033[93m{}\033[00m".format("WARNING: "),
-			print "Loading default config: %s" % philo_cfg_file 
+			print ("\033[93m{}\033[00m".format("WARNING: ")),
+			print ("Loading default config: %s" % philo_cfg_file)
 	else:	
-		print "\n\033[93m{}\033[00m".format("WARNING:"),
-		print " Config file undefined... loading default config: %s" % philo_cfg_file
+		print ("\n\033[93m{}\033[00m".format("WARNING:")),
+		print (" Config file undefined... loading default config: %s" % philo_cfg_file)
 
 	cfg = None
 	tanks = None

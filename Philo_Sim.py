@@ -17,8 +17,8 @@ from vehicle import *
 
 def run_sim(vehicle):
 	# Simulation
-	print "\nPhilo Sim"
-	print "-----------------------"
+	print ("\nPhilo Sim")
+	print ("-----------------------")
 
 	# Sim Constants
 	n = 1000000
@@ -57,7 +57,7 @@ def run_sim(vehicle):
 		flight_time += dt 
 		
 	print("Constant Acceleration - Flight Time (sec): \t %.6f" %flight_time)
-	print "-----------------------\n"
+	print ("-----------------------\n")
 	# ----------------------------------------
 
 	#x = np.zeros ( (n,3) )

@@ -1,7 +1,7 @@
 import matplotlib
 import numpy as np
 #import matplotlib.pyplot as plt
-from env import *
+from .env import *
 
 # Rocket Classes 
 class Propellant:
