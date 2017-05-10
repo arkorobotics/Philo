@@ -57,6 +57,7 @@ def run_sim(vehicle):
         vehicle.Fnull = vehicle.veh_mass * env.g
         vehicle.mass_flow = vehicle.Fnull / vehicle.engine.calc_Ve()
         vehicle.propellant_mass -= vehicle.mass_flow * dt
+        #print ("%s" % vehicle.Fnull)
         flight_time += dt
 
     print("Constant Acceleration - Flight Time (sec): \t %.6f" % flight_time)
@@ -73,5 +74,5 @@ def run_sim(vehicle):
 # plt.show()
 
 if __name__ == "__main__":
-    vehicle = config.load_config(sys.argv)
+    vehicle = config.load_vehicle(sys.argv)
     run_sim(vehicle)

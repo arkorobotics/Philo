@@ -8,12 +8,12 @@ from .env import *
 from .vehicle import *
 
 
-def load_config(cfgfile):
+def load_vehicle(cfgfile):
     # Default Config File
     philo_cfg_file = "philo_cfg.json"
 
     if len(cfgfile) > 1:
-        if os.path.isfile("vehicle/" + cfgfile[1]):
+        if os.path.isfile(cfgfile[1]):
             philo_cfg_file = cfgfile[1]
             # vehicle = config.load_config(cfgfile[1])
         else:
@@ -33,7 +33,7 @@ def load_config(cfgfile):
     heaters = None
     engines = None
 
-    with open("vehicle/" + philo_cfg_file) as cfgson:
+    with open(philo_cfg_file) as cfgson:
         cfg = json.load(cfgson)
 
     with open("vehicle/tanks.json") as tankson:
@@ -111,7 +111,7 @@ def load_config(cfgfile):
 
     # Initialize an Engine Object
     enginedat = cfgdat["engine"]
-    engineobj = Engine(enginedat["Ae_At"], propellantobj, regulatordat["reg_out"], cfgdat["P_ambient"], heaterobj)
+    engineobj = Engine(enginedat["Ae"], enginedat["At"], propellantobj, regulatordat["reg_out"], cfgdat["P_ambient"], heaterobj)
 
     # Create the vehicle object
     vehicleobj = Vehicle(cfgdat["avionics_mass"], cfgdat["mech_mass"], tankobj, propellantobj, regulatorobj, heaterobj,
