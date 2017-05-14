@@ -92,6 +92,21 @@ class Engine:
                               ((self.propellant.gamma+1)/(2*(self.propellant.gamma-1))))
 
         return mass_flow_max
+        
+    '''
+    TODO: Make functions later
+    Ma1 = 1
+    P_1 = P_b
+    P_0 = P_1*(((1+((gamma-1)/2)*(Ma_t**2))**(gamma/(gamma-1))))
+    print ("P_o: %0.2f Pa" % P_0)
+
+    T_1 = T_b
+    T_0 = T_1*(1+(((gamma-1)/2)*(Ma_t)))
+    print ("T_o: %0.2f K" % T_0)
+
+    rho_1 = 1
+    rho_0 = rho_1*(((1+((gamma-1)/2)*(Ma_t**2))**(1/(gamma-1))))
+    '''
 
 class Vehicle:
     def __init__(self, avionics_mass, mech_mass, tank, propellant, regulator, heater, engine):
