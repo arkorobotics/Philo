@@ -5,7 +5,8 @@
 # Author: Ara Kourchians
 # ----------------------------
 
-# TODO: convert to python 3
+# TODO List:
+# TODO: UPDATE Ma, Ve, and Area calculations with correct equations!
 
 import matplotlib
 import numpy as np
