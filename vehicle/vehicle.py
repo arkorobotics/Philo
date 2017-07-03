@@ -1,17 +1,16 @@
-import matplotlib
 import numpy as np
-# import matplotlib.pyplot as plt
 from .env import *
 
 
 # Rocket Classes
-class Propellant:
+class Propellant(object):
     def __init__(self, propellant_type, cp, cv, molar_mass):
         self.propellant_type = propellant_type
         self.cp = cp  # @ 0.0C
         self.cv = cv  # @ 0.0C
         self.molar_mass = molar_mass
         self.gamma = cp / cv
+        # TODO: ADD ENTHALPY
 
 
 class Tank:
@@ -36,77 +35,52 @@ class Regulator:
 
 
 class Heater:
-    def __init__(self, T_chamber):
-        self.T_chamber = T_chamber
+    def __init__(self, chamber_temp):
+        self.chamber_temp = chamber_temp
 
 
 class Engine:
-    def __init__(self, Ae, At, propellant, P_o, P_b, heater):
-        self.Ae = Ae
-        self.At = At
+    def __init__(self, a_e, a_t, propellant, p_o, p_b, heater):
+        self.a_e = a_e
+        self.a_t = a_t
         self.propellant = propellant
         self.heater = heater
-        self.P_b = P_b
-        self.P_o = P_o #self.calc_Po()
-        self.V_e = self.calc_Ve()
-        self.Isp = self.V_e / g
+        self.p_b = p_b
+        self.p_o = p_o
+        self.v_e = self.calc_v_e()
+        self.isp = self.v_e / g
         self.mass_flow = self.calc_mass_flow()
         self.mass_flow_max = self.calc_mass_flow_max()
 
+    @staticmethod
+    def calc_isp(v_e):
+        isp = v_e / g
+        return isp  # sec
 
-    def calc_Po(self, margin=1.0):
-        P_o = self.P_b/((2/(self.propellant.gamma+1))**(self.propellant.gamma/(self.propellant.gamma-1)))
-        P_o *= margin
-        
-        return P_o
+    @staticmethod
+    def calc_area_ratio(ma, gamma):
+        a_ratio = (1 / ma) * \
+                  (((1 + ((gamma - 1) / 2) * (ma ** 2)) / (1 + ((gamma - 1) / 2))) ** ((gamma + 1) / (2 * (gamma - 1))))
+        return a_ratio
 
-    def calc_Ve(self):
-        """
-            Updates V_e and Isp based on current pressure setting P_o.
-            Returns V_e
-        """
-        V_e = np.sqrt(((self.heater.T_chamber * R) / self.propellant.molar_mass) \
-                           * ((2 * self.propellant.gamma) / (self.propellant.gamma - 1)) \
-                           * (1 - (self.P_b / self.P_o) ** (
-                                   (self.propellant.gamma - 1) / self.propellant.gamma)))
+    @staticmethod
+    def calc_a_e(p_o, mass_flow, molar_mass, t_o, ma_e,  gamma):
+        a_e = (mass_flow * (1 + (gamma - 1) * ((ma_e ** 2) / 2)) ** ((gamma + 1) / (2 * (gamma - 1)))) / (
+               ma_e * p_o * np.sqrt((molar_mass * gamma) / (R * t_o)))
+        return a_e  # m^2
 
-        self.Isp = V_e / g
-        return V_e
+    @staticmethod
+    def calc_a_t(a_e, ma_e, gamma):
+        a_t = (a_e * ma_e) * (
+            ((2 / (gamma + 1)) * (1 + ((gamma - 1) / 2) * (ma_e ** 2))) ** ((-(gamma + 1)) / (2 * (gamma - 1))))
+        return a_t
 
     def calc_mass_flow(self):
-        mass_flow = (self.P_b*self.propellant.gamma*self.At) \
-                         * np.sqrt((1/(self.propellant.gamma*R*T_amb)) \
-                         *((2/(self.propellant.gamma+1))**((self.propellant.gamma+1)/(self.propellant.gamma-1))))
-
+        mass_flow = (self.p_b*self.propellant.gamma*self.a_t) \
+                    * np.sqrt((1/(self.propellant.gamma*(R/self.propellant.molar_mass)*ambient_temp)) \
+                    * ((2/(self.propellant.gamma+1))**((self.propellant.gamma+1)/(self.propellant.gamma-1))))
         return mass_flow
 
-    def calc_mass_flow_max(self):
-        # Calculated at nozzle
-        self.Ae_optimal = 6.35e-7
-        self.Ma = 1
-        mass_flow_max = 0
-
-        mass_flow_max = (self.Ae_optimal*self.Ma*self.P_o \
-                            *np.sqrt(self.propellant.gamma/(R*self.heater.T_chamber))) \
-                            / ((1+((self.propellant.gamma-1)*(self.Ma**2))/2)** \
-                              ((self.propellant.gamma+1)/(2*(self.propellant.gamma-1))))
-
-        return mass_flow_max
-        
-    '''
-    TODO: Make functions later
-    Ma1 = 1
-    P_1 = P_b
-    P_0 = P_1*(((1+((gamma-1)/2)*(Ma_t**2))**(gamma/(gamma-1))))
-    print ("P_o: %0.2f Pa" % P_0)
-
-    T_1 = T_b
-    T_0 = T_1*(1+(((gamma-1)/2)*(Ma_t)))
-    print ("T_o: %0.2f K" % T_0)
-
-    rho_1 = 1
-    rho_0 = rho_1*(((1+((gamma-1)/2)*(Ma_t**2))**(1/(gamma-1))))
-    '''
 
 class Vehicle:
     def __init__(self, avionics_mass, mech_mass, tank, propellant, regulator, heater, engine):
@@ -122,8 +96,23 @@ class Vehicle:
         self.wet_mass = self.dry_mass + self.propellant_mass
         self.veh_mass = self.wet_mass  # Initial (wet) condition
 
-        # self.Fnull_max = self.wet_mass * g
-        # self.mass_flow_max = self.Fnull_max/self.engine.V_e_max
-
-        self.Fnull = self.wet_mass * g
+        self.thrust = self.wet_mass * g
         self.mass_flow = self.Fnull / self.engine.V_e
+
+    def update_veh_mass(self):
+        self.propellant_mass = ((self.tank.pressure * self.tank.volume) / (R * self.tank.temp)) \
+                               * self.propellant.molar_mass
+        self.veh_mass = self.dry_mass + self.propellant_mass
+
+    def calc_f_null(self):
+        f_null = self.veh_mass * g
+        return f_null                        # N
+
+    def calc_mass_flow(self, v_e):
+        mass_flow = self.thrust / v_e
+        return mass_flow                    # kg/s
+
+    @staticmethod
+    def calc_delta_v(self, v_e, m_o, m_f):
+        delta_v = v_e * np.log(m_o / m_f)
+        return delta_v
